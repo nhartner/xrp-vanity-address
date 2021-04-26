@@ -35,7 +35,7 @@ public class App {
   }
 
   private static void print(VanityAddress address) {
-    System.out.printf("Address: %s, \tSeed: %s\n",
+    System.out.printf("Address: %s \tSeed: %s\n",
         PrintUtils.highlight(address.address(), address.vanityWord()),
         address.seed());
   }
