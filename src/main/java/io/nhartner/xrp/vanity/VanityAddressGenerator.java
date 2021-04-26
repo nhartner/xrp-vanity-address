@@ -26,10 +26,31 @@ public class VanityAddressGenerator {
     }
     int len = words.iterator().next().length();
     String toMatch = getVanitySubstring(address, len);
+    // doing a case insensitive match on a large word list is very slow. revert to exact match
+    // (which does a much faster "contains" operation on the word set) when using large word lists.
+    return words.size() > 20 ?
+        findUsingExactMatch(seed, address, words, toMatch) :
+        findUsingCaseInsensitiveMatch(seed, address, words, toMatch);
+  }
+
+  private Optional<VanityAddress> findUsingExactMatch(String seed, String address,
+      Set<String> words,
+      String toMatch) {
+    if (words.contains(toMatch)) {
+      return Optional.of(VanityAddress.builder().address(address).vanityWord(toMatch).seed(seed)
+          .build());
+    }
+    return Optional.empty();
+  }
+
+  private Optional<VanityAddress> findUsingCaseInsensitiveMatch(String seed, String address,
+      Set<String> words,
+      String toMatch) {
     return words.stream()
         .filter(word -> word.equalsIgnoreCase(toMatch))
         .findFirst()
-        .map(word -> VanityAddress.builder().address(address).vanityWord(toMatch).seed(seed).build());
+        .map(word -> VanityAddress.builder().address(address).vanityWord(toMatch).seed(seed)
+            .build());
   }
 
   private String getVanitySubstring(String address, int length) {
