@@ -25,7 +25,9 @@ public class App {
     Optional<Integer> maybeMinLength = getMinLength(args);
     if (args.length == 0 || maybeMinLength.isPresent()) {
       int minLength = maybeMinLength.orElse(4);
-      System.out.println("Finding vanity addresses using random words with length >= " + minLength);
+      System.out.println(
+          "Finding vanity addresses using Google top 20K search words with length >= "
+              + minLength);
       return new FileWordsProvider(minLength).getWords();
     }
     System.out.println("Finding vanity addresses using word list: " + Joiner.on(", ").join(args));
