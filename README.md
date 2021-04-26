@@ -1,4 +1,4 @@
-# xrp-vanity-generator
+# XRP Vanity Address Generator
 
 Java app to generate XRP Ledger vanity addresses. Inspired by Wiete
 Wind's [xrp-vanity-generator](https://github.com/WietseWind/xrp-vanity-generator)
