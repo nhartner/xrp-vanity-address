@@ -15,8 +15,8 @@ capable of finding a desired vanity address 75x faster.
 
 1. ### Roulette Mode
 
-   In this mode, vanity addresses are generated against a list of the 20,000 search words according
-   to Google.
+   In this mode, vanity addresses are generated against a list of the top 20,000 search terms
+   according to Google.
    ```shell
    ./vanity-generator.sh
    ```
