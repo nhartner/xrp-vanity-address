@@ -3,9 +3,9 @@ Java app to generate XRP Ledger vanity addresses. Inspired by Wiete Wind's [xrp-
 written in Javascript. The Java version has the advantage of being roughly 75x faster and therefore
 capable of finding a desired vanity address 75x faster.
 
-##Ways to run
+## Ways to run
 
-1. ###Roulette Mode 
+1. ### Roulette Mode 
 
    In this mode, vanity addresses a generated against a list of the 20,000 search words according to Google.
    ```shell
@@ -17,7 +17,7 @@ capable of finding a desired vanity address 75x faster.
    ./vanity-generator.sh 5
    ```
 
-1. ###Targeted Word Mode
+1. ### Targeted Word Mode
    In this mode, only addresses starting with the provided words will be considered.
    ```shell
    ./vanity-generator.sh crypto hodl xrp

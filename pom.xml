@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.nhartner</groupId>
-  <artifactId>xrp-vanity-generator</artifactId>
+  <artifactId>xrp-vanity-address</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>xrp-vanity-generator</name>
+  <name>xrp-vanity-address</name>
   <url>http://maven.apache.org</url>
 
   <build>
