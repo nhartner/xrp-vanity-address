@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd $DIR
+
 export JAVA_PROGRAM_ARGS=`echo "$@"`
-mvn compile exec:java -Dexec.args="$JAVA_PROGRAM_ARGS"
+./mvnw compile exec:java -Dexec.args="$JAVA_PROGRAM_ARGS"
