@@ -1,6 +1,6 @@
 # XRP Vanity Address Generator
 
-Java app to generate XRP Ledger vanity addresses. Inspired by Wiete
+Java app to generate XRP Ledger vanity addresses. Inspired by Wietse
 Wind's [xrp-vanity-generator](https://github.com/WietseWind/xrp-vanity-generator)
 written in Javascript. The Java version has the advantage of being roughly 75x faster and therefore
 capable of finding a desired vanity address 75x faster.
