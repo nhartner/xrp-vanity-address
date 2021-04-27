@@ -28,7 +28,7 @@ public class VanityAddressGenerator {
     String toMatch = getVanitySubstring(address, len);
     // doing a case insensitive match on a large word list is very slow. revert to exact match
     // (which does a much faster "contains" operation on the word set) when using large word lists.
-    return words.size() > 20 ?
+    return words.size() > 20 || len <= 3 ?
         findUsingExactMatch(seed, address, words, toMatch) :
         findUsingCaseInsensitiveMatch(seed, address, words, toMatch);
   }

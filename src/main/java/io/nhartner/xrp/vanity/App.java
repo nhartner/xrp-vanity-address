@@ -12,13 +12,32 @@ public class App {
   public static void main(String[] args) throws IOException, URISyntaxException {
     List<String> words = getWords(args);
     VanityAddressGenerator generator = new VanityAddressGenerator(words);
-    int iterations = 100_000;
+    int iterations = 5000;
     while (true) {
       long start = System.currentTimeMillis();
       generator.findAddresses(iterations).forEach(App::print);
       long end = System.currentTimeMillis();
-      System.out.printf("Analyzing %f addresses/second\r", iterations * 1.0 / (end - start) * 1000);
+      System.out
+          .printf("Analyzing %f addresses/second\r", iterations * 1.0 / (end - start) * 1000);
+
+      iterations = adjustIterations(iterations, start, end);
     }
+  }
+
+  /**
+   * Calculates how many iterations to run to target a 1 second cycle.
+   * @param iterations
+   * @param lastStart
+   * @param lastEnd
+   * @return
+   */
+  private static int adjustIterations(int iterations, long lastStart, long lastEnd) {
+    if ((lastEnd - lastStart) < 1000) {
+      iterations += 2000;
+    } else {
+      iterations -= 1000;
+    }
+    return iterations;
   }
 
   private static List<String> getWords(String[] args) throws IOException, URISyntaxException {
