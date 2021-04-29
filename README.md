@@ -25,4 +25,21 @@ capable of finding a desired vanity address 75x faster.
    ```shell
    ./vanity-generator.sh 5
    ```
+   
+## Generating an offline executable jar
+
+You can generate an executable jar that can be copied and executed on an offline device.
+The offline device only needs Java to be installed.
+
+To build the executable jar, run:
+```shell
+./mvnw package
+```
+
+The executable jar will be created under `target/vanity-generator.jar`
+
+The jar can be executed using `java -jar path/to/vanity-generator.jar`. For example:
+```shell
+java -jar target/vanity-generator.jar crypto hodl xrpd
+```
 
