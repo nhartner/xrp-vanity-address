@@ -12,7 +12,7 @@ public class App {
   public static void main(String[] args) throws IOException, URISyntaxException {
     List<String> words = getWords(args);
     VanityAddressGenerator generator = new VanityAddressGenerator(words);
-    int iterations = 5000;
+    int iterations = 4096;
     while (true) {
       long start = System.currentTimeMillis();
       generator.findAddresses(iterations).forEach(App::print);
@@ -33,9 +33,9 @@ public class App {
    */
   private static int adjustIterations(int iterations, long lastStart, long lastEnd) {
     if ((lastEnd - lastStart) < 1000) {
-      iterations += 2000;
+      iterations += 2048;
     } else {
-      iterations -= 1000;
+      iterations -= 1024;
     }
     return iterations;
   }
