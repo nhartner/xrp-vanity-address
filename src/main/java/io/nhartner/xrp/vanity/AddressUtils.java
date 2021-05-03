@@ -4,16 +4,16 @@ import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.UnsignedInteger;
+import io.nhartner.xrp.vanity.addresses.AddressBase58;
+import io.nhartner.xrp.vanity.addresses.Version;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
-import org.xrpl.xrpl4j.codec.addresses.AddressBase58;
 import org.xrpl.xrpl4j.codec.addresses.UnsignedByteArray;
-import org.xrpl.xrpl4j.codec.addresses.Version;
 import org.xrpl.xrpl4j.keypairs.DefaultKeyPairService;
 import org.xrpl.xrpl4j.keypairs.KeyPair;
 import org.xrpl.xrpl4j.keypairs.KeyPairService;
 
 /**
- * XRP Address methods copied from {@link org.xrpl.xrpl4j.codec.addresses.AddressCodec} but without
+ * XRP Address methods copied from {@link io.nhartner.xrp.vanity.addresses.AddressCodec} but without
  * using the {@link org.xrpl.xrpl4j.model.transactions.Address} class which causes a memory leak
  * because it interns the underlying String value.
  */

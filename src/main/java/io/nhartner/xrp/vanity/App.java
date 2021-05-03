@@ -9,7 +9,13 @@ import java.util.Optional;
 
 public class App {
 
+  public static final String JAVA_SECURITY_EGD = "java.security.egd";
+
   public static void main(String[] args) throws IOException, URISyntaxException {
+    if (System.getProperty(JAVA_SECURITY_EGD) == null) {
+      System.setProperty(JAVA_SECURITY_EGD, "file:/dev/urandom");
+    }
+    System.out.println("Generating random numbers using " + System.getProperty(JAVA_SECURITY_EGD));
     List<String> words = getWords(args);
     VanityAddressGenerator generator = new VanityAddressGenerator(words);
     int iterations = 4096;
@@ -26,6 +32,7 @@ public class App {
 
   /**
    * Calculates how many iterations to run to target a 1 second cycle.
+   *
    * @param iterations
    * @param lastStart
    * @param lastEnd
