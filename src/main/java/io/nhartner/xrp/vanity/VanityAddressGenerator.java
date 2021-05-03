@@ -8,13 +8,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.xrpl.xrpl4j.codec.addresses.AddressCodec;
 import org.xrpl.xrpl4j.codec.addresses.UnsignedByteArray;
-import org.xrpl.xrpl4j.keypairs.DefaultKeyPairService;
-import org.xrpl.xrpl4j.keypairs.KeyPairService;
+import org.xrpl.xrpl4j.codec.addresses.VersionType;
 
 public class VanityAddressGenerator {
 
-  private static final KeyPairService KEY_PAIR_SERVICE = DefaultKeyPairService.getInstance();
+  private static final AddressCodec addressCodec = AddressCodec.getInstance();
 
   private final WordsByLengthMap wordsMap;
 
@@ -72,7 +72,7 @@ public class VanityAddressGenerator {
         .mapToObj($ -> nextSeeds(mutations))
         .parallel()
         .flatMap(seeds -> seeds)
-        .map(seed -> KEY_PAIR_SERVICE.generateSeed(UnsignedByteArray.of(seed)))
+        .map(seed -> generateSeed(UnsignedByteArray.of(seed)))
         .flatMap(seed -> findVanityAddresses(seed).stream())
         .collect(Collectors.toList());
   }
@@ -85,6 +85,10 @@ public class VanityAddressGenerator {
           next[15] = (byte) ((base[15] + i)  % 64);
           return next;
         });
+  }
+
+  private String generateSeed(UnsignedByteArray entropy) {
+    return this.addressCodec.encodeSeed(entropy, VersionType.ED25519);
   }
 
   private List<VanityAddress> findVanityAddresses(String seed) {
