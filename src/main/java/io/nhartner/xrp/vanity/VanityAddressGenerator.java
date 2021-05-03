@@ -1,11 +1,14 @@
 package io.nhartner.xrp.vanity;
 
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.xrpl.xrpl4j.codec.addresses.UnsignedByteArray;
 import org.xrpl.xrpl4j.keypairs.DefaultKeyPairService;
 import org.xrpl.xrpl4j.keypairs.KeyPairService;
 
@@ -55,23 +58,38 @@ public class VanityAddressGenerator {
 
   private String getVanitySubstring(String address, int length) {
     if (address.startsWith("r")) {
-      return address.substring(1, 1 + length);
+      return address.substring(1, Math.min(address.length(), length + 1));
     }
     // x-address
     return address.substring(2, 2 + length);
   }
 
   public List<VanityAddress> findAddresses(int iterations) {
-    return IntStream.range(0, iterations)
+    // random seed generation can be a limiting factor for performance so mutate the last byte of
+    // the random to get more seed permutations per random seed
+    int mutations = 32;
+    return IntStream.range(0, iterations / mutations)
         .parallel()
-        .mapToObj($ -> KEY_PAIR_SERVICE.generateSeed())
+        .mapToObj($ -> nextSeeds(mutations))
+        .flatMap(seeds -> seeds)
+        .map(seed -> KEY_PAIR_SERVICE.generateSeed(UnsignedByteArray.of(seed)))
         .flatMap(seed -> findVanityAddresses(seed).stream())
         .collect(Collectors.toList());
   }
 
+  private Stream<byte[]> nextSeeds(int count) {
+    byte[] base = SecureRandom.getSeed(16);
+    return IntStream.range(0, count)
+        .mapToObj(i -> {
+          byte[] next = Arrays.copyOf(base, base.length);
+          next[15] = (byte) ((base[15] + i)  % 64);
+          return next;
+        });
+  }
+
   private List<VanityAddress> findVanityAddresses(String seed) {
     String address = AddressUtils.computeClassicAddress(seed);
-    return IntStream.range(wordsMap.minLength(), wordsMap.maxLength() + 1)
+    return IntStream.range(wordsMap.minLength(), Math.max(wordsMap.maxLength() + 1, 33))
         .mapToObj(wordsMap::getWordsWithLength)
         .map(words -> findVanityMatch(seed, address, words))
         .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty())
