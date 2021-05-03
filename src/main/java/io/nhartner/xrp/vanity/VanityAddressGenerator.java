@@ -15,6 +15,7 @@ import org.xrpl.xrpl4j.codec.addresses.VersionType;
 public class VanityAddressGenerator {
 
   private static final AddressCodec addressCodec = AddressCodec.getInstance();
+  public static final String SKIP_PREFIX = "SKIP_PREFIX";
 
   private final WordsByLengthMap wordsMap;
 
@@ -28,7 +29,18 @@ public class VanityAddressGenerator {
       return Optional.empty();
     }
     int len = words.iterator().next().length();
-    String toMatch = getVanitySubstring(address, len);
+    int maxOffset = len > 3 ? 2 : 1;
+    return IntStream.range(0, maxOffset)
+        .mapToObj(i -> getVanitySubstring(address, i, len))
+        .filter(i -> !i.equals(SKIP_PREFIX))
+        .map(prefix -> matchFound(seed, address, words, len, prefix))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
+  }
+
+  private Optional<VanityAddress> matchFound(String seed, String address, Set<String> words,
+      int len, String toMatch) {
     // doing a case insensitive match on a large word list is very slow. revert to exact match
     // (which does a much faster "contains" operation on the word set) when using large word lists.
     return words.size() > 20 || len <= 3 ?
@@ -56,12 +68,14 @@ public class VanityAddressGenerator {
             .build());
   }
 
-  private String getVanitySubstring(String address, int length) {
-    if (address.startsWith("r")) {
-      return address.substring(1, Math.min(address.length(), length + 1));
+  private String getVanitySubstring(String address, int offset, int length) {
+    int startIndex = 1 + offset;
+    String prefix = address.substring(0, startIndex);
+    char lastChar = prefix.charAt(prefix.length() - 1);
+    if (!prefix.toLowerCase().equals(prefix) || Character.isDigit(lastChar)) {
+      return SKIP_PREFIX;
     }
-    // x-address
-    return address.substring(2, 2 + length);
+    return address.substring(1 + offset, Math.min(address.length(), length + startIndex));
   }
 
   public List<VanityAddress> findAddresses(int iterations) {
