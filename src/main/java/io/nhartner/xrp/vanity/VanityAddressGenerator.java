@@ -67,10 +67,10 @@ public class VanityAddressGenerator {
   public List<VanityAddress> findAddresses(int iterations) {
     // random seed generation can be a limiting factor for performance so mutate the last byte of
     // the random to get more seed permutations per random seed
-    int mutations = 32;
+    int mutations = 64;
     return IntStream.range(0, iterations / mutations)
-        .parallel()
         .mapToObj($ -> nextSeeds(mutations))
+        .parallel()
         .flatMap(seeds -> seeds)
         .map(seed -> KEY_PAIR_SERVICE.generateSeed(UnsignedByteArray.of(seed)))
         .flatMap(seed -> findVanityAddresses(seed).stream())
