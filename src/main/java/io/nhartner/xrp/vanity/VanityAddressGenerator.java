@@ -1,5 +1,6 @@
 package io.nhartner.xrp.vanity;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
@@ -8,13 +9,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.xrpl.xrpl4j.codec.addresses.AddressCodec;
 import org.xrpl.xrpl4j.codec.addresses.UnsignedByteArray;
-import org.xrpl.xrpl4j.keypairs.DefaultKeyPairService;
-import org.xrpl.xrpl4j.keypairs.KeyPairService;
+import org.xrpl.xrpl4j.codec.addresses.VersionType;
 
 public class VanityAddressGenerator {
 
-  private static final KeyPairService KEY_PAIR_SERVICE = DefaultKeyPairService.getInstance();
+  private static final AddressCodec addressCodec = AddressCodec.getInstance();
 
   private final WordsByLengthMap wordsMap;
 
@@ -28,7 +29,12 @@ public class VanityAddressGenerator {
       return Optional.empty();
     }
     int len = words.iterator().next().length();
-    String toMatch = getVanitySubstring(address, len);
+    String vanityString = getVanitySubstring(address, 0, len);
+    return matchFound(seed, address, words, len, vanityString);
+  }
+
+  private Optional<VanityAddress> matchFound(String seed, String address, Set<String> words,
+      int len, String toMatch) {
     // doing a case insensitive match on a large word list is very slow. revert to exact match
     // (which does a much faster "contains" operation on the word set) when using large word lists.
     return words.size() > 20 || len <= 3 ?
@@ -56,12 +62,11 @@ public class VanityAddressGenerator {
             .build());
   }
 
-  private String getVanitySubstring(String address, int length) {
-    if (address.startsWith("r")) {
-      return address.substring(1, Math.min(address.length(), length + 1));
-    }
-    // x-address
-    return address.substring(2, 2 + length);
+  private String getVanitySubstring(String address, int offset, int length) {
+    int startIndex = 1 + offset;
+    String prefix = address.substring(0, startIndex);
+    char lastChar = prefix.charAt(prefix.length() - 1);
+    return address.substring(1 + offset, Math.min(address.length(), length + startIndex));
   }
 
   public List<VanityAddress> findAddresses(int iterations) {
@@ -72,19 +77,27 @@ public class VanityAddressGenerator {
         .mapToObj($ -> nextSeeds(mutations))
         .parallel()
         .flatMap(seeds -> seeds)
-        .map(seed -> KEY_PAIR_SERVICE.generateSeed(UnsignedByteArray.of(seed)))
+        .map(seed -> generateSeed(UnsignedByteArray.of(seed)))
         .flatMap(seed -> findVanityAddresses(seed).stream())
         .collect(Collectors.toList());
   }
 
   private Stream<byte[]> nextSeeds(int count) {
-    byte[] base = SecureRandom.getSeed(16);
-    return IntStream.range(0, count)
-        .mapToObj(i -> {
-          byte[] next = Arrays.copyOf(base, base.length);
-          next[15] = (byte) ((base[15] + i)  % 64);
-          return next;
-        });
+    try {
+      byte[] base = SecureRandom.getInstanceStrong().getSeed(16);
+      return IntStream.range(0, count)
+          .mapToObj(i -> {
+            byte[] next = Arrays.copyOf(base, base.length);
+            next[15] = (byte) ((base[15] + i)  % 64);
+            return next;
+          });
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private String generateSeed(UnsignedByteArray entropy) {
+    return this.addressCodec.encodeSeed(entropy, VersionType.ED25519);
   }
 
   private List<VanityAddress> findVanityAddresses(String seed) {
