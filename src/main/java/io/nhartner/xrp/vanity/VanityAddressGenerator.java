@@ -84,7 +84,7 @@ public class VanityAddressGenerator {
 
   private Stream<byte[]> nextSeeds(int count) {
     try {
-      byte[] base = SecureRandom.getInstanceStrong().getSeed(16);
+      byte[] base = SecureRandom.getInstance("SHA1PRNG").getSeed(16);
       return IntStream.range(0, count)
           .mapToObj(i -> {
             byte[] next = Arrays.copyOf(base, base.length);
