@@ -8,12 +8,16 @@ import com.google.common.primitives.UnsignedInteger;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
-import org.xrpl.xrpl4j.codec.addresses.AddressBase58;
-import org.xrpl.xrpl4j.codec.addresses.AddressCodec;
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+import org.xrpl.xrpl4j.codec.addresses.Decoded;
+import org.xrpl.xrpl4j.codec.addresses.UnsignedByte;
 import org.xrpl.xrpl4j.codec.addresses.UnsignedByteArray;
 import org.xrpl.xrpl4j.codec.addresses.Version;
 import org.xrpl.xrpl4j.codec.addresses.VersionType;
+import org.xrpl.xrpl4j.codec.addresses.exceptions.DecodeException;
 import org.xrpl.xrpl4j.keypairs.Ed25519KeyPairService;
+import org.xrpl.xrpl4j.keypairs.HashUtils;
 import org.xrpl.xrpl4j.keypairs.KeyPair;
 import org.xrpl.xrpl4j.keypairs.KeyPairService;
 import org.xrpl.xrpl4j.keypairs.Secp256k1KeyPairService;
@@ -60,9 +64,27 @@ public class AddressUtils {
   }
 
   public static KeyPair deriveKeyPair(String seed) {
-    return addressCodec.decodeSeed(seed).type()
-        .map((type) -> getKeyPairServiceByType(type).deriveKeyPair(seed))
-        .orElseThrow(() -> new IllegalArgumentException("Unsupported seed type."));
+    Decoded decoded = addressCodec.decodeSeed(seed);
+    if (!decoded.version().equals(Version.ED25519_SEED)) {
+      throw new DecodeException(
+          "Seed must use ED25519 algorithm. Algorithm was " + decoded.version());
+    } else {
+      return deriveKeyPair(decoded.bytes());
+    }
+  }
+
+  private static KeyPair deriveKeyPair(UnsignedByteArray seed) {
+    UnsignedByteArray rawPrivateKey = HashUtils.sha512Half(seed);
+    Ed25519PrivateKeyParameters privateKey = new Ed25519PrivateKeyParameters(
+        rawPrivateKey.toByteArray(), 0);
+    Ed25519PublicKeyParameters publicKey = privateKey.generatePublicKey();
+    UnsignedByte prefix = UnsignedByte.of(237);
+    UnsignedByteArray prefixedPrivateKey = UnsignedByteArray.of(prefix, new UnsignedByte[0])
+        .append(UnsignedByteArray.of(privateKey.getEncoded()));
+    UnsignedByteArray prefixedPublicKey = UnsignedByteArray.of(prefix, new UnsignedByte[0])
+        .append(UnsignedByteArray.of(publicKey.getEncoded()));
+    return KeyPair.builder().privateKey(prefixedPrivateKey.hexValue())
+        .publicKey(prefixedPublicKey.hexValue()).build();
   }
 
 }

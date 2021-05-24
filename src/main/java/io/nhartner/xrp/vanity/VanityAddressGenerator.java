@@ -1,5 +1,7 @@
 package io.nhartner.xrp.vanity;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.UnsignedInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -11,9 +13,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import org.xrpl.xrpl4j.codec.addresses.AddressCodec;
 import org.xrpl.xrpl4j.codec.addresses.UnsignedByteArray;
-import org.xrpl.xrpl4j.codec.addresses.VersionType;
+import org.xrpl.xrpl4j.codec.addresses.Version;
 
 public class VanityAddressGenerator {
 
@@ -100,7 +101,8 @@ public class VanityAddressGenerator {
   }
 
   private String generateSeed(UnsignedByteArray entropy) {
-    return this.addressCodec.encodeSeed(entropy, VersionType.ED25519);
+    return AddressBase58
+        .encode(entropy, Lists.newArrayList(Version.ED25519_SEED), UnsignedInteger.valueOf(16));
   }
 
   private List<VanityAddress> findVanityAddresses(String seed) {
