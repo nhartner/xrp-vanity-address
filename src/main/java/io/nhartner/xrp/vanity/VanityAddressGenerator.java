@@ -19,7 +19,10 @@ public class VanityAddressGenerator {
 
   private final WordsByLengthMap wordsMap;
 
-  public VanityAddressGenerator(List<String> words) {
+  private final SecureRandom secureRandom;
+
+  public VanityAddressGenerator(List<String> words) throws NoSuchAlgorithmException {
+    secureRandom = SecureRandom.getInstance("SHA1PRNG");
     this.wordsMap = new WordsByLengthMap(words);
   }
 
@@ -64,8 +67,6 @@ public class VanityAddressGenerator {
 
   private String getVanitySubstring(String address, int offset, int length) {
     int startIndex = 1 + offset;
-    String prefix = address.substring(0, startIndex);
-    char lastChar = prefix.charAt(prefix.length() - 1);
     return address.substring(1 + offset, Math.min(address.length(), length + startIndex));
   }
 
@@ -83,17 +84,13 @@ public class VanityAddressGenerator {
   }
 
   private Stream<byte[]> nextSeeds(int count) {
-    try {
-      byte[] base = SecureRandom.getInstance("SHA1PRNG").getSeed(16);
-      return IntStream.range(0, count)
-          .mapToObj(i -> {
-            byte[] next = Arrays.copyOf(base, base.length);
-            next[15] = (byte) ((base[15] + i)  % 64);
-            return next;
-          });
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    }
+    byte[] base = secureRandom.getSeed(16);
+    return IntStream.range(0, count)
+        .mapToObj(i -> {
+          byte[] next = Arrays.copyOf(base, base.length);
+          next[15] = (byte) ((base[15] + i) % 64);
+          return next;
+        });
   }
 
   private String generateSeed(UnsignedByteArray entropy) {
