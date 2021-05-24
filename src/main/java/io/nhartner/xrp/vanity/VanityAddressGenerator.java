@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -20,6 +22,9 @@ public class VanityAddressGenerator {
   private final WordsByLengthMap wordsMap;
 
   private final SecureRandom secureRandom;
+
+  private ForkJoinPool customThreadPool = new ForkJoinPool(16);
+
 
   public VanityAddressGenerator(List<String> words) throws NoSuchAlgorithmException {
     secureRandom = SecureRandom.getInstance("SHA1PRNG");
@@ -70,17 +75,18 @@ public class VanityAddressGenerator {
     return address.substring(1 + offset, Math.min(address.length(), length + startIndex));
   }
 
-  public List<VanityAddress> findAddresses(int iterations) {
+  public List<VanityAddress> findAddresses(int iterations)
+      throws ExecutionException, InterruptedException {
     // random seed generation can be a limiting factor for performance so mutate the last byte of
     // the random to get more seed permutations per random seed
     int mutations = 64;
-    return IntStream.range(0, iterations / mutations)
+    return customThreadPool.submit(() -> IntStream.range(0, iterations / mutations)
         .mapToObj($ -> nextSeeds(mutations))
         .parallel()
         .flatMap(seeds -> seeds)
         .map(seed -> generateSeed(UnsignedByteArray.of(seed)))
         .flatMap(seed -> findVanityAddresses(seed).stream())
-        .collect(Collectors.toList());
+        .collect(Collectors.toList())).get();
   }
 
   private Stream<byte[]> nextSeeds(int count) {
