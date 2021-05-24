@@ -45,7 +45,7 @@ chmod 755 xrp-vanity-generator
 ```
 Note: Newer versions of OSX will not execute the binary since it will consider it an untrusted download. The following command
 will allow you to override that restriction:
-```shell```
+```shell
 sudo spctl --master-disable
 ```
 
