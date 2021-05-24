@@ -29,10 +29,11 @@ public class WordsByLengthMap {
   }
 
   public static Map<Integer, Set<String>> toNormalizedWordByLength(List<String> words) {
-//    List<String> lower = words.stream()
-//        .map(String::toLowerCase)
-//        .map(WordsByLengthMap::toBase58Alphabet)
-//        .collect(Collectors.toList());
+    List<String> lower = words.stream()
+        .map(String::toLowerCase)
+        .map(text -> text.substring(0, 1).toUpperCase() + text.substring(1))
+        .map(WordsByLengthMap::toBase58Alphabet)
+        .collect(Collectors.toList());
 
     List<String> upper = words.stream()
         .map(String::toUpperCase)
@@ -41,7 +42,7 @@ public class WordsByLengthMap {
 
     List<String> all = new ImmutableList.Builder<String>()
         .addAll(upper)
-//        .addAll(lower)
+        .addAll(lower)
         .build();
 
     return all.stream()
