@@ -25,7 +25,30 @@ capable of finding a desired vanity address 75x faster.
    ```shell
    ./vanity-generator.sh 5
    ```
-   
+
+## Running from binary
+
+If you do not have Java and Maven installed, you can alternately the download a native binary executable.
+
+### Linux
+```shell
+curl -Lo xrp-vanity-generator https://github.com/nhartner/xrp-vanity-address/raw/main/dist/linux/xrp-vanity-generator
+chmod 755 xrp-vanity-generator
+./xrp-vanity-generator
+```
+
+### OSX
+```shell
+curl -Lo xrp-vanity-generator https://github.com/nhartner/xrp-vanity-address/raw/main/dist/darwin/xrp-vanity-generator
+chmod 755 xrp-vanity-generator
+./xrp-vanity-generator
+```
+Note: Newer versions of OSX will not execute the binary since it will consider it an untrusted download. The following command
+will allow you to override that restriction:
+```shell```
+sudo spctl --master-disable
+```
+
 ## Generating an offline executable jar
 
 You can generate an executable jar that can be copied and executed on an offline device.
