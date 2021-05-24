@@ -3,14 +3,15 @@ package io.nhartner.xrp.vanity;
 import com.google.common.base.Joiner;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 
 public class App {
 
-  public static void main(String[] args) throws IOException, URISyntaxException {
+  public static void main(String[] args)
+      throws IOException, URISyntaxException, NoSuchAlgorithmException {
     List<String> words = getWords(args);
     VanityAddressGenerator generator = new VanityAddressGenerator(words);
     int iterations = 4096;

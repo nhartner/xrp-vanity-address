@@ -19,9 +19,9 @@ import org.xrpl.xrpl4j.keypairs.KeyPairService;
 import org.xrpl.xrpl4j.keypairs.Secp256k1KeyPairService;
 
 /**
- * XRP Address methods copied from {@link io.nhartner.xrp.vanity.addresses.AddressCodec} but without
- * using the {@link org.xrpl.xrpl4j.model.transactions.Address} class which causes a memory leak
- * because it interns the underlying String value.
+ * XRP Address methods copied from {@link AddressCodec} but without using the {@link
+ * org.xrpl.xrpl4j.model.transactions.Address} class which causes a memory leak because it interns
+ * the underlying String value.
  */
 public class AddressUtils {
 
@@ -60,11 +60,9 @@ public class AddressUtils {
   }
 
   public static KeyPair deriveKeyPair(String seed) {
-    return (KeyPair) addressCodec.decodeSeed(seed).type().map((type) -> {
-      return getKeyPairServiceByType(type).deriveKeyPair(seed);
-    }).orElseThrow(() -> {
-      return new IllegalArgumentException("Unsupported seed type.");
-    });
+    return addressCodec.decodeSeed(seed).type()
+        .map((type) -> getKeyPairServiceByType(type).deriveKeyPair(seed))
+        .orElseThrow(() -> new IllegalArgumentException("Unsupported seed type."));
   }
 
 }
