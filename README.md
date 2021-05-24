@@ -28,7 +28,7 @@ capable of finding a desired vanity address 75x faster.
 
 ## Running from binary
 
-If you do not have Java and Maven installed, you can alternately the download a native binary executable.
+If you do not have Java and Maven installed, you can alternately the download a native binary executable which can be run offline once downloaded.
 
 ### Linux
 ```shell
