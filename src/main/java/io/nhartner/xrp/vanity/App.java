@@ -7,11 +7,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 public class App {
 
   public static void main(String[] args)
-      throws IOException, URISyntaxException, NoSuchAlgorithmException {
+      throws IOException, URISyntaxException, NoSuchAlgorithmException, ExecutionException, InterruptedException {
     List<String> words = getWords(args);
     VanityAddressGenerator generator = new VanityAddressGenerator(words);
     int iterations = 4096;
@@ -28,6 +29,7 @@ public class App {
 
   /**
    * Calculates how many iterations to run to target a 1 second cycle.
+   *
    * @param iterations
    * @param lastStart
    * @param lastEnd
