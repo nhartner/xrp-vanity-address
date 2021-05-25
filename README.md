@@ -32,10 +32,11 @@ If you do not have Java and Maven installed, you can alternately the download a 
 
 ### Linux
 ```shell
-curl -Lo xrp-vanity-generator https://github.com/nhartner/xrp-vanity-address/raw/main/dist/linux/xrp-vanity-generator
+curl -Lo xrp-vanity-generator https://github.com/nhartner/xrp-vanity-address/raw/main/dist/linux-amd64/xrp-vanity-generator
 chmod 755 xrp-vanity-generator
 ./xrp-vanity-generator
 ```
+Note: currently does not work with musl-based Linux distros like Alpine. 
 
 ### OSX
 ```shell
