@@ -54,6 +54,8 @@ sudo spctl --master-disable
 
 Download https://github.com/nhartner/xrp-vanity-address/raw/main/dist/windows/xrp-vanity-generator.exe
 
+Execute `xrp-vanity-generator.exe` from a Windows command shell.
+
 ## Generating an offline executable jar
 
 You can generate an executable jar that can be copied and executed on an offline device.
