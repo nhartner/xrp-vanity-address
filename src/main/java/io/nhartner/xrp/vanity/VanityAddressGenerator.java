@@ -23,7 +23,7 @@ public class VanityAddressGenerator {
 
   private final SecureRandom secureRandom;
 
-  private ForkJoinPool customThreadPool = new ForkJoinPool(16);
+  private ForkJoinPool customThreadPool = new ForkJoinPool();
 
 
   public VanityAddressGenerator(List<String> words) throws NoSuchAlgorithmException {
